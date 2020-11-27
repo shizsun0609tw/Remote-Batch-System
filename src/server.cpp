@@ -1,12 +1,12 @@
 #include "server.h"
 
 boost::asio::io_context *Session::io_context_;
-const std::string Session::CGI_PATH = "./cgi";
-const std::string Session::COMMAND_PATH = "./command";
+const std::string Session::CGI_PATH = "/cgi";
+const std::string Session::COMMAND_PATH = "/command";
 
 Session::Session(tcp::socket socket) : socket_(std::move(socket))
 {
-
+	status_str = "HTTP/1.1 200 OK\n";
 }
 
 void Session::SetContext(boost::asio::io_context *io_context)
@@ -72,7 +72,7 @@ void Session::DoRead()
 			std::getline(iss, REQUEST_URI, '?');
 			std::getline(iss, QUERY_STRING);
 
-			EXEC_FILE = CGI_PATH + REQUEST_URI;
+			EXEC_FILE = boost::filesystem::current_path().string() + CGI_PATH + REQUEST_URI;
 
 			SetEnv();
 			PrintEnv();		
@@ -84,7 +84,7 @@ void Session::DoRead()
 void Session::DoWrite(std::size_t length)
 {
 	auto self(shared_from_this());
-	boost::asio::async_write(socket_, boost::asio::buffer(data_, max_length),
+	boost::asio::async_write(socket_, boost::asio::buffer(status_str, status_str.length()),
 		[this, self](boost::system::error_code ec, std::size_t )
 		{
 			if (ec) return;
@@ -110,10 +110,9 @@ void Session::DoWrite(std::size_t length)
 				if (execlp(EXEC_FILE.c_str(), EXEC_FILE.c_str(), NULL) < 0)
 				{
 					std::cout << "Content-type:text/html\r\n\r\n<h1>Fail</h1>";
+					fflush(stdout);
 				}
 			}
-		
-			DoRead();
 		});
 }
 

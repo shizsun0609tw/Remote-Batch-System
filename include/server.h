@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <boost/asio.hpp>
+#include <boost/filesystem.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -36,6 +37,7 @@ private:
 	char data_[max_length];	
 
 private:
+	std::string status_str;
 	std::string REQUEST_METHOD;
 	std::string REQUEST_URI;
 	std::string QUERY_STRING;
