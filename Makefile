@@ -18,12 +18,14 @@ CXX_LIB_PARAMS = $(addprefix -L, $(CXX_LIB_DIRS))
 TARGET = http_server
 CGI_TARGET = console
 
-all:${TARGET}
+all:$(TARGET) $(CGI_TARGET)
 
-${TARGET}:$(filter-out ${DIR_OBJ}/$(TARGET).o, $(OBJ))
+${TARGET}:$(filter-out $(DIR_OBJ)/$(CGI_TARGET).o, $(OBJ))
 	mkdir -p $(DIR_CGI)
 	$(CXX) -o $@ $^ $(CFLAGS) $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS)
-	$(CXX) -o $(DIR_CGI)/$(CGI_TARGET).cgi $^ $(CFLAGS) $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS)
+
+$(CGI_TARGET) : $(DIR_OBJ)/$(CGI_TARGET).o
+	$(CXX) -o $(DIR_CGI)/$@.cgi $^ $(CFLAGS) $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS)
 
 $(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp
 	mkdir -p $(DIR_OBJ)
