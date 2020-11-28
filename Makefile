@@ -23,6 +23,10 @@ mkdir =
 CGI_SUFFIX =
 CGI_FLAG =
 
+DEL1 = 
+DEL2 = 
+DEL3 =
+
 ifeq ($(OS), Windows_NT)
 	DIR_INC = include
 	DIR_SRC = src
@@ -35,10 +39,15 @@ ifeq ($(OS), Windows_NT)
 	CXX_LIB_PARAMS = 
 	CGI_SUFFIX = .o
 	CGI_FLAG = -c -o
+	DEL1 = del $(DIR_OBJ)
+	DEL2 = del $(TARGET2).exe
 else
 	mkdir = mkdir -p $(DIR_OBJ)
 	CGI_SUFFIX = .cgi
 	CGI_FLAG = -o
+	DEL1 = rm -rf $(DIR_OBJ)/*.o
+	DEL2 = rm -f  $(DIR_CGI)/$(CGI_TARGET).cgi
+	DEL3 = rm -f  $(TARGET)
 endif
 
 all:
@@ -66,6 +75,6 @@ $(DIR_OBJ)/%.o: $(DIR_SRC)/%.cpp
 
 .PHONY:clean
 clean:
-	rm -rf $(DIR_OBJ)/*.o
-	rm -f  $(DIR_CGI)/$(CGI_TARGET).cgi
-	rm -f  $(TARGET)
+	$(DEL1)
+	$(DEL2)
+	$(DEL3)
