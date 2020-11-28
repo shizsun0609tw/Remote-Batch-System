@@ -1,5 +1,8 @@
 #pragma once
 
+#include "console.h"
+#include "Panel.h"
+
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -23,6 +26,7 @@ public:
 private:
 	void DoRead();
 	void DoWrite(std::size_t length);
+	void DoCGI();
 	void SetEnv();
 	void PrintEnv();
 
@@ -34,6 +38,10 @@ private:
 	tcp::socket socket_;
 	enum {max_length = 1024};
 	char data_[max_length];	
+
+private:
+	Console myConsole;
+	Panel myPanel;
 
 private:
 	std::string status_str;

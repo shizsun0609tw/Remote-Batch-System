@@ -24,7 +24,11 @@ Console::Console()
 
 void Console::InitClients()
 {
-	std::string buffer(getenv("QUERY_STRING"));
+	#ifdef __linux__
+	QUERY_STRING = getenv("QUERY_STRING");
+	#endif
+
+	std::string buffer(QUERY_STRING);
 	std::string temp, port, addr, file;
 
 	std::replace(buffer.begin(), buffer.end(), '&', ' ');
@@ -49,6 +53,16 @@ void Console::InitClients()
 	}
 }
 
+void Console::SetWebSocket(boost::asio::ip::tcp::socket *socket)
+{
+	web_socket = socket;
+}
+
+void Console::SetQuery(std::string query_string)
+{
+	QUERY_STRING = query_string;
+}
+
 void Console::Link2Server()
 {
 	for (int i = 0; i < (int)clients.size(); ++i)
@@ -57,7 +71,6 @@ void Console::Link2Server()
 		boost::asio::ip::tcp::resolver::query query(clients[i].serverAddr, std::to_string(clients[i].serverPort));
 		boost::asio::ip::tcp::resolver::iterator iter = resolver.resolve(query);
 		boost::asio::ip::tcp::endpoint endpoint = *iter;
-
 		clients[i].socket.connect(endpoint);
 	}
 }
@@ -143,8 +156,8 @@ void Console::SendInitialHTML()
   			</body>\
 		</html>";
 
-	std::cout << contentType << initHTML << std::endl;
-	fflush(stdout);
+	DoWrite(contentType);
+	DoWrite(initHTML);
 }
 
 void Console::SendShellInput(int session, std::vector<std::string> input)
@@ -173,8 +186,8 @@ void Console::SendShellInput(int session, std::vector<std::string> input)
 				pos = 0;
 			}
 
-			std::cout << "<script>document.getElementById(\'s" + std::to_string(session) + "\').innerHTML += \'<b>" + content + "</b>\';</script>";
-			fflush(stdout);
+			std::string buffer = "<script>document.getElementById(\'s" + std::to_string(session) + "\').innerHTML += \'<b>" + content + "</b>\';</script>";
+			DoWrite(buffer);
 
 			std::vector<std::string> temp = input;
 
@@ -205,8 +218,8 @@ void Console::SendShellOutput(int session, std::string content)
 		pos = 0;
 	}
 
-	std::cout << "<script>document.getElementById(\'s" + std::to_string(session) + "\').innerHTML += \'" + content + "\';</script>";
-	fflush(stdout);
+	std::string temp = "<script>document.getElementById(\'s" + std::to_string(session) + "\').innerHTML += \'" + content + "\';</script>";
+	DoWrite(temp);
 }
 
 std::vector<std::string> Console::GetShellInput(std::string testFile)
@@ -255,6 +268,26 @@ void Console::GetShellOutput(int session, std::vector<std::string> input)
 		});
 }
 
+void Console::DoWrite(std::string content)
+{
+	#ifdef __linux__
+	std::cout << content;
+	fflush(stdout);
+	#else
+	if (web_socket == NULL) 
+	{
+		std::cout << "web_socket error" << std::endl;
+		return;
+	}
+	boost::asio::async_write(*web_socket, boost::asio::buffer(content, content.length()),
+	[this](boost::system::error_code ec, std::size_t )
+	{
+		if (ec) return;
+	});
+	#endif
+}
+
+#ifdef __linux__
 int main(int argc, char* argv[])
 {
 	Console myConsole;
@@ -267,3 +300,4 @@ int main(int argc, char* argv[])
 
 	return 0;
 }
+#endif
