@@ -56,7 +56,7 @@ part1:$(TARGET) $(CGI_TARGET)
 
 part2:$(TARGET2)
 
-$(TARGET):$(filter-out $(DIR_OBJ)/$(TARGET2).o, $(OBJ))
+$(TARGET):$(filter-out $(DIR_OBJ)/$(TARGET2).o $(DIR_OBJ)/$(CGI_TARGET).o, $(OBJ))
 	$(mkdir)
 	$(CXX) -o $@ $^ $(CFLAGS) $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS)
 

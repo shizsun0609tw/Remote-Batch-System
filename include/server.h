@@ -1,7 +1,10 @@
 #pragma once
 
+#ifdef __linux__
 #include "console.h"
-#include "Panel.h"
+#endif
+
+#include "panel.h"
 
 #include <cstdlib>
 #include <iostream>
@@ -32,7 +35,6 @@ private:
 
 private:
 	static boost::asio::io_context *io_context_;
-	const static std::string CGI_PATH;
 
 private:
 	tcp::socket socket_;
@@ -40,7 +42,9 @@ private:
 	char data_[max_length];	
 
 private:
+	#ifndef __linux__
 	Console myConsole;
+	#endif
 	Panel myPanel;
 
 private:

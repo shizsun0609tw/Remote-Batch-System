@@ -1,7 +1,6 @@
 #include "server.h"
 
 boost::asio::io_context *Session::io_context_;
-const std::string Session::CGI_PATH = "/cgi";
 
 Session::Session(tcp::socket socket) : socket_(std::move(socket))
 {
@@ -44,7 +43,7 @@ void Session::PrintEnv()
 	HTTP_HOST = getenv("HTTP_HOST");
 	SERVER_ADDR = getenv("SERVER_ADDR");
 	SERVER_PORT = getenv("SERVER_PORT");
-	SREMOTE_ADDR = getenv("REMOTE_ADDR");
+	REMOTE_ADDR = getenv("REMOTE_ADDR");
 	REMOTE_PORT = getenv("REMOTE_PORT");
 	EXEC_FILE = getenv("EXEC_FILE");
 	#endif
@@ -87,7 +86,7 @@ void Session::DoRead()
 			std::getline(iss, QUERY_STRING);
 
 			#ifdef __linux__
-			EXEC_FILE = boost::filesystem::current_path().string() + CGI_PATH + REQUEST_URI;
+			EXEC_FILE = boost::filesystem::current_path().string() + REQUEST_URI;
 			#endif
 
 			SetEnv();

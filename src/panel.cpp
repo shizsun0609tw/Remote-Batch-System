@@ -43,7 +43,7 @@ void Panel::Run(boost::asio::ip::tcp::socket &socket)
         TEST_CASE_MENU += "<option value=\"" + testFile[i] + "\">" + testFile[i] + "</option>";
     }
 
-    std::string DOMAIN = ".cs.nctu.edu.tw";
+    std::string domain = ".cs.nctu.edu.tw";
     std::vector<std::string> hosts;
     std::vector<std::string> host_menu;
     for (int i = 0; i < 12; ++i) 
@@ -52,7 +52,7 @@ void Panel::Run(boost::asio::ip::tcp::socket &socket)
     }
     for (int i = 0; i < (int)hosts.size(); ++i)
     {
-        host_menu.push_back("<option value=\"" + hosts[i] + DOMAIN + "\">" + hosts[i] + "</option>");
+        host_menu.push_back("<option value=\"" + hosts[i] + domain + "\">" + hosts[i] + "</option>");
     }
 
     DoWrite(socket, "<Content-type>:text/html\r\n\r\n");
