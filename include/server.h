@@ -29,7 +29,6 @@ private:
 private:
 	static boost::asio::io_context *io_context_;
 	const static std::string CGI_PATH;
- 	const static std::string COMMAND_PATH;
 
 private:
 	tcp::socket socket_;

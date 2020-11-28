@@ -16,13 +16,22 @@ CXX_LIB_PARAMS = $(addprefix -L, $(CXX_LIB_DIRS))
 
 
 TARGET = http_server
+TARGET2 = cgi_server
 CGI_TARGET = console
 
-all:$(TARGET) $(CGI_TARGET)
+all:
 
-${TARGET}:$(filter-out $(DIR_OBJ)/$(CGI_TARGET).o, $(OBJ))
+part1:$(TARGET) $(CGI_TARGET)
+
+part2:$(TARGET2) $(CGI_TARGET)
+
+$(TARGET):$(filter-out $(DIR_OBJ)/$(CGI_TARGET).o $(DIR_OBJ)/$(TARGET2).o, $(OBJ))
 	mkdir -p $(DIR_CGI)
 	$(CXX) -o $@ $^ $(CFLAGS) $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS)
+
+$(TARGET2):$(filter-out $(DIR_OBJ)/$(CGI_TARGET).o $(DIR_OBJ)/$(TARGET).o, $(OBJ))
+	mkdir -p $(DIR_CGI)
+	$(CXX) -o $@ $^ -lws2_32 -lwsock32 -std=c++14
 
 $(CGI_TARGET) : $(DIR_OBJ)/$(CGI_TARGET).o
 	$(CXX) -o $(DIR_CGI)/$@.cgi $^ $(CFLAGS) $(CXX_INCLUDE_PARAMS) $(CXX_LIB_PARAMS)

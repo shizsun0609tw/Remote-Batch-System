@@ -2,7 +2,6 @@
 
 boost::asio::io_context *Session::io_context_;
 const std::string Session::CGI_PATH = "/cgi";
-const std::string Session::COMMAND_PATH = "/command";
 
 Session::Session(tcp::socket socket) : socket_(std::move(socket))
 {

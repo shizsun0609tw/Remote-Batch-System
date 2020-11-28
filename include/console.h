@@ -14,7 +14,7 @@ public:
 	std::string serverAddr;
 	std::string testFile;
 	boost::asio::ip::tcp::socket socket;
-	char data_[1024];
+	char data_[10240];
 };
 
 class Console

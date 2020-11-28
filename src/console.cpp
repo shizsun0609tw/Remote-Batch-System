@@ -156,7 +156,7 @@ void Console::SendShellInput(int session, std::vector<std::string> input)
 		{
 			std::string from[7] = {"&", "\"", "\'", "<", ">", "\n", "\r\n"};
 			std::string to[7] = {"&amp;", "&quot", "&#39;", "&lt;", "&gt;", "&NewLine;", "&NewLine;"};
-			std::string content = input[0] + "\n";
+			std::string content = input[0];
 			size_t pos = 0;
 
 			for (int i = 0; i < 7; ++i)
@@ -196,6 +196,7 @@ void Console::SendShellOutput(int session, std::string content)
 
 		while (pos != std::string::npos)
 		{
+
 			content.replace(pos, from[i].length(), to[i]);
 			pos += to[i].length();
 			pos = content.find(from[i], pos);
@@ -211,17 +212,17 @@ void Console::SendShellOutput(int session, std::string content)
 std::vector<std::string> Console::GetShellInput(std::string testFile)
 {
 	std::ifstream in("./test_case/" + testFile);
-	char buffer[1024];
+	char buffer[10240];
 	std::vector<std::string> res;
 
-	memset(buffer, 0, 1024);
+	memset(buffer, 0, 10240);
 
 	if (in.is_open())
 	{	
-		while(in.getline(buffer, 1024))
+		while(in.getline(buffer, 10240))
 		{
-			res.push_back(std::string(buffer));
-			memset(buffer, 0, 1024);
+			res.push_back(std::string(buffer) + "\n");
+			memset(buffer, 0, 10240);
 		}	
 	}
 
@@ -230,13 +231,16 @@ std::vector<std::string> Console::GetShellInput(std::string testFile)
 
 void Console::GetShellOutput(int session, std::vector<std::string> input)
 {
-	clients[session].socket.async_read_some(boost::asio::buffer(clients[session].data_, 1024),
+	clients[session].socket.async_read_some(boost::asio::buffer(clients[session].data_, 10240),
 		[this, input, session](boost::system::error_code ec, std::size_t length)
 		{
-			if (ec)	return;
+			if (ec)	
+			{
+				return;
+			}
 
 			std::string temp(clients[session].data_);
-			memset(clients[session].data_, 0, 1024);
+			memset(clients[session].data_, 0, 10240);
 
 			SendShellOutput(session, temp);
 
