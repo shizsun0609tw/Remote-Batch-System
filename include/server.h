@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef __linux__
+#ifndef __linux__
 #include "console.h"
 #endif
 
